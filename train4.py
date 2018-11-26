@@ -49,6 +49,13 @@ user_args, _ = parser.parse_known_args()
 
 #user_input arch... - default is vgg19
 
+#Importing data
+data_dir = 'flowers'
+train_dir = data_dir + '/train'
+valid_dir = data_dir + '/valid'
+test_dir = data_dir + '/test'
+
+
 directory = user_args.data_dir
 
 #get a path to the correct folder
