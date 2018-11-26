@@ -283,11 +283,6 @@ def train_model(model, criterion, optimizer, num_epochs, device = device):
                 running_loss += loss.item() * images.size(0)
                 accurate += torch.sum(predicted == labels.data).float() #needs to be float for epoch_accuracy to work
                
-                            
-            epoch_loss = running_loss / dataset_sizes[stage]
-            epoch_acc = accurate.double() / dataset_sizes[stage]
-            
-            print('{} Loss: {:.4f} Acc: {:.4f}'.format(stage, epoch_loss, epoch_acc))
             
                 # deep copy the model
             if stage == 'valid' and epoch_acc > best_acc:
