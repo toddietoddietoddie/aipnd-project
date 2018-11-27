@@ -36,7 +36,7 @@ with open('cat_to_name.json', 'r') as f:
 
 # Define the command line arguments
 parser = argparse.ArgumentParser()
-parser.add_argument('--data_dir', type=str, help='Path to dataset ')
+parser.add_argument('data_dir', type=str, help='Path to dataset ')
 parser.add_argument('--gpu', action='store_true', help='Use GPU if available')
 parser.add_argument('--epochs', type=int, default = 1, help='Number of epochs')
 parser.add_argument('--arch', type=str, default = 'vgg19', help='Model architecture')
