@@ -231,18 +231,6 @@ def train_model(model, criterion, optimizer, num_epochs, device = device):
     print('Number of epochs:', num_epochs)
     print('Learning rate:', learning_rate)
 
-    dataloaders = {
-        x: data.DataLoader(img_datasets[x], batch_size=4, shuffle=True, num_workers=2)
-        for x in list(img_datasets.keys())
-    }
- 
-    # Calculate dataset sizes.
-    dataset_sizes = {
-        x: len(dataloaders[x].dataset) 
-        for x in list(img_datasets.keys())
-    }
-    
-    num_labels = len(img_datasets['train'].classes)
     
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
