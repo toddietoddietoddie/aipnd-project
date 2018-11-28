@@ -15,6 +15,7 @@ import torch.nn.functional as F
 from torch.autograd import variable
 from torchvision import datasets, transforms, models
 
+
 import copy
 import time
 
@@ -31,8 +32,6 @@ time.sleep(.5)
 #If cuda is available then we will use cuda.
 device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 
-with open('cat_to_name.json', 'r') as f:
-    cat_to_name = json.load(f)
 
 # Define the command line arguments
 parser = argparse.ArgumentParser()
@@ -49,15 +48,9 @@ user_args, _ = parser.parse_known_args()
 
 #user_input arch... - default is vgg19
 
-#Importing data
-data_dir = 'flowers'
-train_dir = data_dir + '/train'
-valid_dir = data_dir + '/valid'
-test_dir = data_dir + '/test'
 
 
 directory = user_args.data_dir
-
 #get a path to the correct folder
 data_dir = 'flowers'
 if directory == 'train_dir':
@@ -100,10 +93,6 @@ test_data_transforms = transforms.Compose([transforms.Resize(256),
 train_dataset = datasets.ImageFolder(train_dir, transform = train_data_transforms)
 valid_dataset = datasets.ImageFolder(valid_dir, transform = valid_data_transforms)
 test_dataset = datasets.ImageFolder(test_dir, transform = test_data_transforms)
-print(train_dir)
-print(len(train_dataset))
-print(len(valid_dataset))
-print(len(test_dataset))
 
 #put the datasets into a list for easier indexing
 img_datasets = {'train': train_dataset,
@@ -122,12 +111,14 @@ dataloaders = {'train': train_dataloader,
                'test': test_dataloader
               }
 
-    
+with open('cat_to_name.json', 'r') as f:
+    cat_to_name = json.load(f)
 
-print(directory)   
 
 architecture = user_args.arch    
+print(architecture)
 model = models.__dict__[architecture](pretrained = True)
+print(model)
 
 #model = models.vgg19(pretrained=True)
 
@@ -149,10 +140,9 @@ vgg_in_features = 25088
 #user hidden_units - default = 4000
 hidden_units = user_args.hidden_units
 
-#works with both vgg and alexnet default is vgg19
-pretrained_network = user_args.arch
 
-if not pretrained_network.startswith('alexnet') and not pretrained_network.startswith('vgg'):
+#works with both vgg and alexnet default is vgg19
+if not architecture.startswith('alexnet') and not architecture.startswith('vgg'):
     print('-Dudes... The network runs with vgg or alexnet-')
     time.sleep(.7)
     print("-I'm all for a good time but I can only party with vgg or alexnet-")
@@ -161,21 +151,22 @@ if not pretrained_network.startswith('alexnet') and not pretrained_network.start
     exit(1)
 
 # Input size from current classifier if VGG
-if pretrained_network.startswith("vgg"):
+if architecture.startswith("vgg"):
     input_size = vgg_in_features
     print('-vgg was my first love.-')
     time.sleep(.5)
     print("-Don't tell alexnet...-")
 
 #adjust classifier features for alexnet
-if pretrained_network.startswith("alexnet"):
+if architecture.startswith("alexnet"):
     input_size = alexnet_in_features
     print('-Right on... Alex makes killer guacamole.-')  
 
+
 #set gradient to false to freeze parameters
-for param in model.parameters():
+for param in model.paramaters():
     param.requires_grad = False
-     
+    
 #New classifier for the flowers
 classifier = nn.Sequential(OrderedDict([
     ('fc1', nn.Linear(input_size, hidden_units)),
@@ -188,6 +179,7 @@ classifier = nn.Sequential(OrderedDict([
 model.classifier = classifier
 print('-Classifier input_features are now {} to work with {} network.-'.format(input_size, architecture))
 print('-The hidden layer size is {}.-'.format(hidden_units))
+    
 
 model.to(device)
 
@@ -230,7 +222,6 @@ def train_model(model, criterion, optimizer, num_epochs, device = device):
     print('Number of hidden units:', hidden_units)
     print('Number of epochs:', num_epochs)
     print('Learning rate:', learning_rate)
-
     
     best_model_wts = copy.deepcopy(model.state_dict())
     best_acc = 0.0
@@ -239,8 +230,7 @@ def train_model(model, criterion, optimizer, num_epochs, device = device):
         
         print('EPOCH {}/{}:'.format(epoch+1, num_epochs))
                 
-        for stage in ['train', 'valid']:
-                          
+        for stage in ['train', 'valid']:                   
             if stage == 'train':
                 #set the model to train model with .train() 
                 model.train()
@@ -270,7 +260,8 @@ def train_model(model, criterion, optimizer, num_epochs, device = device):
                 
                 running_loss += loss.item() * images.size(0)
                 accurate += torch.sum(predicted == labels.data).float() #needs to be float for epoch_accuracy to work
-                
+               
+                            
                     
             #calculate the loss and accuracy for each stage 
             
@@ -287,7 +278,8 @@ def train_model(model, criterion, optimizer, num_epochs, device = device):
                 epoch_accuracy = accurate / len(test_dataset)
             
             print('{} LOSS = {:.4f} ACCURACY = {:.4f}'.format(stage, epoch_loss, epoch_accuracy))
-        
+            
+            
         
       #  print('Done... Saving for future use...')
 
